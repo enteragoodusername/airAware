@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+        <link rel="stylesheet" href="styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+</head>
+<body>
+    <a id="map_link" href="/map.html"><img src="map-icon.svg"></a>
+    <div id="connection_div">
+        <h1>Connect your device</h1>
+        <button id="connect_button">Connect</button>
+    </div>
+    <div id="stats_div" hidden>
+         <div class="overview_label">Overview</div>
+        <div class="overview_status" id="overview_status">Moderate</div>
+        <div class="overview_text" id="overview_text">
+            Air quality is currently moderate. Conditions look stable for this test display.
+        </div>
+        <h1>Air Quality Stats</h1>
+
+        <div class="stats_grid">
+            <div class="stat_card">
+                <div class="stat_label">Temperature</div>
+                <div class="stat_value"><span id="temp_value">24</span><span class="stat_unit">°C</span></div>
+            </div>
+
+            <div class="stat_card">
+                <div class="stat_label">PPM</div>
+                <div class="stat_value"><span id="ppm_value">412</span><span class="stat_unit">ppm</span></div>
+            </div>
+
+            <div class="stat_card">
+                <div class="stat_label">Humidity</div>
+                <div class="stat_value"><span id="humidity_value">58</span><span class="stat_unit">%</span></div>
+            </div>
+    </div>
+                <button id="publish_data">Publish Data</button>
+
+</div>
+    <script src="index.js"></script>
+</body>

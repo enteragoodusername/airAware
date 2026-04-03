@@ -1,0 +1,6 @@
+
+*.env
+#editor files
+*~
+
+*node_modules
