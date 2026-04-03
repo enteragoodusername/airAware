@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirAware | Global Alerts</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <canvas id="bg_canvas"></canvas>
+
+    <a href="index.html" class="nav-btn" title="Back to Device">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+    </a>
+
+    <div class="screen">
+        <header class="dash-header" style="padding: 15px 24px; border-bottom: 1px solid var(--border);">
+            <div class="logo-block">
+                <div class="logo-text">
+                    <span class="brand-name" style="font-size: 1.2rem;">AIRAWARE</span>
+                    <span class="brand-tagline">GLOBAL ALERT NETWORK</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="map"></div>
+
+        <main class="map-summary">
+            <h2 class="brand-name" style="font-size: 1rem; margin-bottom: 20px;">NETWORK AVERAGES</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">AVG TEMP</div>
+                    <div class="stat-value"><span id="avg_temp">--.-</span><span class="stat-unit">°C</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">AVG PPM</div>
+                    <div class="stat-value"><span id="avg_ppm">----</span><span class="stat-unit">PPM</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">AVG HUMIDITY</div>
+                    <div class="stat-value"><span id="avg_humid">--.-</span><span class="stat-unit">%</span></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="js/map.js"></script>
+</body>
+</html>

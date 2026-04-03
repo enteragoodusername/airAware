@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirAware | Smart Air Quality Monitor</title>
+    
+    <!-- External Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <canvas id="bg_canvas"></canvas>
+
+    <!-- Navigation to Map (Pulsing Icon) -->
+    <a href="map.html" class="nav-btn" title="View Global Map">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+    </a>
+
+    <!-- CONNECTION SCREEN -->
+    <div id="connection_div" class="screen connection-screen">
+        <div class="logo-block">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="url(#logo_grad)" stroke-width="2"/>
+                    <path d="M8 12C8 12 9 11 12 11C15 11 16 12 16 12" stroke="url(#logo_grad)" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M7 15C7 15 8.5 14 12 14C15.5 14 17 15 17 15" stroke="url(#logo_grad)" stroke-width="2" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="logo_grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#00c9b8"/>
+                            <stop offset="1" stop-color="#c8f135"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span class="brand-name">AIRAWARE</span>
+                <span class="brand-tagline">ATMOSPHERIC INTELLIGENCE</span>
+            </div>
+        </div>
+
+        <div class="connect-card">
+            <div class="connect-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+            </div>
+            <h2>Device Connection</h2>
+            <p>Connect your AirAware hardware module via Bluetooth Low Energy to start real-time monitoring.</p>
+            
+            <button id="connect_button" class="btn-primary">
+                <span class="btn-icon">⚡</span>
+                CONNECT MODULE
+            </button>
+
+            <div class="ble-status">
+                <span id="status_dot" class="status-dot idle"></span>
+                <span id="ble_status_text">IDLE — WAITING</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="stats_div" class="screen dashboard-screen" hidden>
+        <header class="dash-header">
+            <div class="logo-block compact">
+                <div class="logo-text">
+                    <span class="brand-name">AIRAWARE</span>
+                    <span class="brand-tagline">LIVE TELEMETRY</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="publish_data" class="btn-publish">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    PUBLISH
+                </button>
+                <div class="conn-badge">
+                    <span class="status-dot live"></span>
+                    CONNECTED
+                </div>
+            </div>
+        </header>
+
+        <main class="dash-main">
+            <div class="status-banner">
+                <div class="status-label">CURRENT STATUS</div>
+                <div class="status-content">
+                    <div id="overview_status" class="status-value">ANALYZING...</div>
+                    <div id="overview_text" class="status-detail">Syncing sensors.</div>
+                </div>
+            </div>
+
+            <section class="gauge-section">
+                <div class="gauge-wrapper">
+                    <canvas id="gauge_canvas" width="340" height="210"></canvas>
+                    <div class="gauge-center">
+                        <div class="gauge-reading">
+                            <span id="ppm_value" class="gauge-number">---</span>
+                            <span class="gauge-unit">PPM</span>
+                        </div>
+                        <div class="gauge-label">CO₂ CONCENTRATION</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="cards-row">
+                <div class="sensor-card">
+                    <div class="card-icon temp-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path></svg>
+                    </div>
+                    <div class="card-data">
+                        <div class="card-label">TEMP</div>
+                        <div class="card-reading"><span id="temp_value" class="card-value">--.-</span><span class="card-unit">°C</span></div>
+                        <div class="card-bar-track"><div id="temp_bar" class="card-bar temp-bar" style="width: 0%"></div></div>
+                    </div>
+                </div>
+                <div class="sensor-card">
+                    <div class="card-icon humid-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                    </div>
+                    <div class="card-data">
+                        <div class="card-label">HUMIDITY</div>
+                        <div class="card-reading"><span id="humidity_value" class="card-value">--.-</span><span class="card-unit">%</span></div>
+                        <div class="card-bar-track"><div id="humid_bar" class="card-bar humid-bar" style="width: 0%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="history-section">
+                <div class="section-title">EXPOSURE TREND</div>
+                <canvas id="history_canvas"></canvas>
+            </section>
+        </main>
+    </div>
+
+    <!-- Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>
