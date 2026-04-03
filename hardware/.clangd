@@ -1,0 +1,9 @@
+CompileFlags:
+  Compiler: /home/emilio/.platformio/packages/toolchain-xtensa-esp32/bin/xtensa-esp32-elf-g++
+  Remove:
+    - -fno-tree-switch-conversion
+    - -fstrict-volatile-bitfields
+    - -mlongcalls
+    - -mfix-esp32-psram-cache-strategy=memw
+    - -mfix-esp32-psram-cache-*
+  BuiltinHeaders: QueryDriver

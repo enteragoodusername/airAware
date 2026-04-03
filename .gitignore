@@ -4,3 +4,5 @@
 *~
 
 *node_modules
+/hardware/.cache/clangd/index
+/hardware/.pio

@@ -22,7 +22,7 @@ const dbConfig = {
     }
 };
 
-const poolPromise = sql.connect(dbConfig);
+let poolPromise = sql.connect(dbConfig);
 
 function buildZoneFromRow(row) {
     const zoneLat = row.zone_lat;
@@ -163,6 +163,10 @@ app.get("/api/readings", async function (req, res) {
     } catch (e) {
         console.error("ERROR IN /api/readings:", e);
         res.status(500).json({ error: "Failed to fetch readings" });
+        if (e.code === "ETIMEOUT") {
+
+            poolPromise = sql.connect(dbConfig);
+        }
     }
 });
 

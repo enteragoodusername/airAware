@@ -124,9 +124,9 @@ function update_summary(){
     if (count !== 0){
             document.getElementById('summary').hidden = false;
             document.getElementById('no-data').hidden = true;
-            document.getElementById('temp_value').innerHTML= total_temp/count;
-            document.getElementById('humidity_value').innerHTML= total_humidity/count;
-            document.getElementById('ppm_value').innerHTML= total_ppm/count;
+            document.getElementById('temp_value').innerHTML= parseFloat(total_temp/count).toFixed(1);
+            document.getElementById('humidity_value').innerHTML= parseFloat(total_humidity/count).toFixed(1);
+            document.getElementById('ppm_value').innerHTML= parseFloat(total_ppm/count).toFixed(1);
     }
     else{
             document.getElementById('summary').hidden = true;
