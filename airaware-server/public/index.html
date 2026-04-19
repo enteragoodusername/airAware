@@ -1,20 +1,71 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
-        <link rel="stylesheet" href="styles.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Orbitron:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <a id="map_link" href="/map.html"><img src="map-icon.svg"></a>
-    <div id="connection_div">
-        <h1>Connect your device</h1>
-        <button id="connect_button">Connect</button>
+    <!-- Animated Canvas Background -->
+    <canvas id="bg_canvas"></canvas>
+
+    <a id="map_link" href="/map.html"><img src="map-icon.svg" alt="Map"></a>
+    
+    <!-- NEW CONNECTION SCREEN -->
+    <div id="connection_div" class="screen connection-screen">
+        <div class="logo-block">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)">
+                    <circle cx="12" cy="12" r="10" stroke="url(#logo_grad)" stroke-width="2"/>
+                    <path d="M8 12C8 12 9 11 12 11C15 11 16 12 16 12" stroke="url(#logo_grad)" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M7 15C7 15 8.5 14 12 14C15.5 14 17 15 17 15" stroke="url(#logo_grad)" stroke-width="2" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="logo_grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#00c9b8"/>
+                            <stop offset="1" stop-color="#c8f135"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span class="brand-name">AIRAWARE</span>
+                <span class="brand-tagline">CLEAN AIR STARTS WITH AWARENESS</span>
+            </div>
+        </div>
+
+        <div class="connect-card">
+            <div class="connect-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                    <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                    <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                </svg>
+            </div>
+            <h2>Device Connection</h2>
+            <p>Connect your AirAware hardware module via Bluetooth Low Energy to start real-time monitoring.</p>
+            
+            <button id="connect_button" class="btn-primary">
+                <span class="btn-icon">⚡</span>
+                CONNECT MODULE
+            </button>
+
+            <div class="ble-status">
+                <span id="status_dot" class="status-dot idle"></span>
+                <span id="ble_status_text">IDLE — WAITING</span>
+            </div>
+        </div>
     </div>
+
+    <!-- EXISTING STATS SCREEN -->
     <div id="stats_div" hidden>
-         <div class="overview_label">Overview</div>
+        <div class="overview_label">Overview</div>
         <div class="overview_status" id="overview_status">Moderate</div>
         <div class="overview_text" id="overview_text">
             Air quality is currently moderate. Conditions look stable for this test display.
         </div>
+        
         <h1>Air Quality Stats</h1>
 
         <div class="stats_grid">
@@ -32,9 +83,11 @@
                 <div class="stat_label">Humidity</div>
                 <div class="stat_value"><span id="humidity_value">58</span><span class="stat_unit">%</span></div>
             </div>
+        </div>
+        
+        <button id="publish_data">Publish Data</button>
     </div>
-                <button id="publish_data">Publish Data</button>
 
-</div>
     <script src="index.js"></script>
 </body>
+</html>
