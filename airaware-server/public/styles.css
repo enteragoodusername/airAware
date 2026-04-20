@@ -273,7 +273,7 @@ html, body {
     color: var(--lime);
 }
 
-#map_link {
+#map_link, #device_link {
     position: fixed;
     top: 1rem;
     right: 1rem;
@@ -292,7 +292,7 @@ html, body {
     transition: var(--transition);
 }
 
-#map_link img {
+#map_link img, #device_link img{
     width: 60%;
     height: 60%;
     filter: invert(72%) sepia(87%) saturate(354%) hue-rotate(124deg) brightness(98%) contrast(102%);
@@ -315,3 +315,5 @@ html, body {
 }
 #publish_data:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0, 201, 184, 0.45); }
 #publish_data:disabled { opacity: 0.6; cursor: default; }
+
+#map { height: 50%; }
