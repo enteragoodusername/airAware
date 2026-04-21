@@ -124,9 +124,15 @@ function update_summary(){
     if (count !== 0){
             document.getElementById('summary').hidden = false;
             document.getElementById('no-data').hidden = true;
-            document.getElementById('temp_value').innerHTML= parseFloat(total_temp/count).toFixed(1);
-            document.getElementById('humidity_value').innerHTML= parseFloat(total_humidity/count).toFixed(1);
-            document.getElementById('ppm_value').innerHTML= parseFloat(total_ppm/count).toFixed(1);
+            let avgTemp = parseFloat(total_temp/count).toFixed(1);
+            let avgHum = parseFloat(total_humidity/count).toFixed(1);
+            let avgPpm = parseFloat(total_ppm/count).toFixed(1);
+
+            document.getElementById('temp_value').innerHTML = avgTemp;
+            document.getElementById('humidity_value').innerHTML = avgHum;
+            document.getElementById('ppm_value').innerHTML = avgPpm;
+
+            updateDashboardGauges(Number(avgTemp), Number(avgPpm), Number(avgHum));
     }
     else{
             document.getElementById('summary').hidden = true;
@@ -134,3 +140,59 @@ function update_summary(){
     }
 }
 setTimeout(update_summary, 1000);
+
+
+const { AgCharts } = agCharts;
+
+function createGaugeOptions(containerId, min, max, unit) {
+  return {
+      type: "linear-gauge",
+      container: document.getElementById(containerId),
+      value: 0,
+      background: {
+          fill: "transparent", 
+      },
+      theme: {
+          overrides: {
+              "linear-gauge": {
+                  background: {
+                      fill: "transparent",
+                  },
+                  series: {
+                      fill: "#4facfe", 
+                      fillOpacity: 0.8,
+                      strokeWidth: 0,
+                      backgroundFill: "rgba(255, 255, 255, 0.1)",
+                  }
+              },
+          },
+      },
+      scale: {
+          min,
+          max,
+          label: {
+              fontFamily: "inherit",
+              color: "#009e90", 
+          }
+      },
+      direction: "horizontal",
+      cornerRadius: 99,
+      cornerMode: "container",
+      padding: { left: 5, right: 5, bottom: 20, top: 5 },
+  };
+}
+
+const tempChart = AgCharts.createGauge(createGaugeOptions("temp_chart", 0, 150, "°C"));
+const ppmChart = AgCharts.createGauge(createGaugeOptions("ppm_chart", 0, 3000, "ppm"));
+const humidityChart = AgCharts.createGauge(createGaugeOptions("humidity_chart", 0, 100, "%"));
+
+
+function updateDashboardGauges(temp, ppm, hum) {
+    document.getElementById("temp_value").innerText = temp;
+    document.getElementById("ppm_value").innerText = ppm;
+    document.getElementById("humidity_value").innerText = hum;
+
+    tempChart.update({ value: temp });
+    ppmChart.update({ value: ppm });
+    humidityChart.update({ value: hum });
+}

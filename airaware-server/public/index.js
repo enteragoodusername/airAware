@@ -51,6 +51,41 @@ function animateBg() {
     });
     requestAnimationFrame(animateBg);
 }
+const { AgCharts } = agCharts;
+
+function createGaugeOptions(containerId, min, max) {
+  return {
+      type: "linear-gauge",
+      container: document.getElementById(containerId),
+      value: 0,
+      background: { fill: "transparent" },
+      theme: {
+          overrides: {
+              "linear-gauge": {
+                  background: { fill: "transparent" },
+                  series: {
+                      fill: "#00c9b8", 
+                      fillOpacity: 0.8,
+                      strokeWidth: 0,
+                      backgroundFill: "rgba(255, 255, 255, 0.1)",
+                  }
+              },
+          },
+      },
+      scale: {
+          min, max,
+          label: { fontFamily: "inherit", color: "#ffffff" }
+      },
+      direction: "horizontal",
+      cornerRadius: 99,
+      cornerMode: "container",
+      padding: { left: 5, right: 5, bottom: 20, top: 5 },
+  };
+}
+
+const tempChart = AgCharts.createGauge(createGaugeOptions("temp_chart", 0, 50));
+const ppmChart = AgCharts.createGauge(createGaugeOptions("ppm_chart", 0, 3000));
+const humidityChart = AgCharts.createGauge(createGaugeOptions("humidity_chart", 0, 100));
 
 window.addEventListener('resize', initBg);
 initBg();
@@ -73,20 +108,23 @@ if (connectBtn) {
 
             charPPM.addEventListener('characteristicvaluechanged', (e) => {
                 ppm = e.target.value.getFloat32(0, true).toFixed(1);
-                document.getElementById("ppm_value").textContent = Math.round(ppm);
+                //document.getElementById("ppm_value").textContent = Math.round(ppm);
                 updateOverview(ppm);
+                updateDashboardGauges(temp || 0, ppm, humidity || 0);
             });
             await charPPM.startNotifications();
 
             charTemp.addEventListener('characteristicvaluechanged', (e) => {
                 temp = e.target.value.getFloat32(0, true).toFixed(1);
-                document.getElementById("temp_value").textContent = temp;
+                //document.getElementById("temp_value").textContent = temp;
+                updateDashboardGauges(temp, ppm || 0, humidity || 0);
             });
             await charTemp.startNotifications();
 
             charHumidity.addEventListener('characteristicvaluechanged', (e) => {
                 humidity = e.target.value.getFloat32(0, true).toFixed(1);
-                document.getElementById("humidity_value").textContent = humidity;
+                //document.getElementById("humidity_value").textContent = humidity;
+                updateDashboardGauges(temp || 0, ppm || 0, humidity)
             });
             await charHumidity.startNotifications();
 
@@ -142,4 +180,21 @@ async function sendReading(ppm, hum, temp, lon, lat) {
             body: JSON.stringify({ device_id: "esp32-1", ppm, humidity: hum, temperature: temp, longitude: lon, latitude: lat, time: new Date().toISOString() })
         });
     } catch (e) { console.error(e); }
+}
+
+function updateDashboardGauges(temp, ppm, hum) {
+    let gaugeColor = "#00c9b8"; 
+    if (ppm > 1000 && ppm < 1500) gaugeColor = "#FFD700"; 
+    if (ppm >= 1500) gaugeColor = "#FF4500"; 
+
+    document.getElementById("temp_value").innerText = temp;
+    document.getElementById("ppm_value").innerText = ppm;
+    document.getElementById("humidity_value").innerText = hum;
+
+    tempChart.update({ value: Number(temp) });
+    ppmChart.update({ 
+        value: Number(ppm),
+        series: { fill: gaugeColor } 
+    });
+    humidityChart.update({ value: Number(hum) });
 }

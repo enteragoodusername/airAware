@@ -71,21 +71,22 @@
         <div class="stats_grid">
             <div class="stat_card">
                 <div class="stat_label">Temperature</div>
-                <div class="stat_value"><span id="temp_value">24</span><span class="stat_unit">°C</span></div>
+                <div class="stat_value"><span id="temp_value">...</span><span class="stat_unit">°C</span></div>
+                <div id="temp_chart" style="height: 100px;"></div> 
             </div>
-
+            
             <div class="stat_card">
                 <div class="stat_label">PPM</div>
-                <div class="stat_value"><span id="ppm_value">412</span><span class="stat_unit">ppm</span></div>
+                <div class="stat_value"><span id="ppm_value">...</span><span class="stat_unit">ppm</span></div>
+                <div id="ppm_chart" style="height: 100px;"></div>
             </div>
-
+            
             <div class="stat_card">
                 <div class="stat_label">Humidity</div>
-                <div class="stat_value"><span id="humidity_value">58</span><span class="stat_unit">%</span></div>
+                <div class="stat_value"><span id="humidity_value">...</span><span class="stat_unit">%</span></div>
+                <div id="humidity_chart" style="height: 100px;"></div>
             </div>
         </div>
-        
-        <button id="publish_data">Publish Data</button>
     </div>
 
     <script src="index.js"></script>
