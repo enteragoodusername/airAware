@@ -51,7 +51,6 @@ function animateBg() {
     });
     requestAnimationFrame(animateBg);
 }
-const { AgCharts } = agCharts;
 
 function createGauge(containerId, min, max, color = '#00c9b8') {
     const container = document.getElementById(containerId);
@@ -197,7 +196,7 @@ function updateDashboardGauges(temp, ppm, hum) {
     if (ppm > 1000 && ppm < 1500) ppmColor = '#FFD700';
     if (ppm >= 1500)               ppmColor = '#FF4500';
 
-    updateAlert(Number(ppm));
+    updateGauge(Number(ppm));
  
     document.getElementById('temp_value').innerText     = temp;
     document.getElementById('ppm_value').innerText      = ppm;
