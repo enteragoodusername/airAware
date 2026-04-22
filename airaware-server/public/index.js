@@ -53,84 +53,87 @@ function animateBg() {
 }
 const { AgCharts } = agCharts;
 
-function createGaugeOptions(containerId, min, max) {
-  return {
-      type: "linear-gauge",
-      container: document.getElementById(containerId),
-      value: 0,
-      background: { fill: "transparent" },
-      theme: {
-          overrides: {
-              "linear-gauge": {
-                  background: { fill: "transparent" },
-                  series: {
-                      fill: "#00c9b8", 
-                      fillOpacity: 0.8,
-                      strokeWidth: 0,
-                      backgroundFill: "rgba(255, 255, 255, 0.1)",
-                  }
-              },
-          },
-      },
-      scale: {
-          min, max,
-          label: { fontFamily: "inherit", color: "#ffffff" }
-      },
-      direction: "horizontal",
-      cornerRadius: 99,
-      cornerMode: "container",
-      padding: { left: 5, right: 5, bottom: 20, top: 5 },
-  };
+function createGauge(containerId, min, max, color = '#00c9b8') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = `
+        <div class="css-gauge" data-min="${min}" data-max="${max}">
+            <div class="css-gauge__track">
+                <div class="css-gauge__fill" style="width: 0%; background: ${color};"></div>
+                <div class="css-gauge__thumb"></div>
+            </div>
+            <div class="css-gauge__labels">
+                <span>${min}</span>
+                <span>${max}</span>
+            </div>
+        </div>`;
 }
-
-const tempChart = AgCharts.createGauge(createGaugeOptions("temp_chart", 0, 50));
-const ppmChart = AgCharts.createGauge(createGaugeOptions("ppm_chart", 0, 3000));
-const humidityChart = AgCharts.createGauge(createGaugeOptions("humidity_chart", 0, 100));
-
+ 
+function updateGauge(containerId, value, color) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const gauge   = container.querySelector('.css-gauge');
+    const fill    = container.querySelector('.css-gauge__fill');
+    const thumb   = container.querySelector('.css-gauge__thumb');
+    if (!gauge || !fill) return;
+ 
+    const min = parseFloat(gauge.dataset.min);
+    const max = parseFloat(gauge.dataset.max);
+    const pct = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+ 
+    fill.style.width = pct + '%';
+    if (color) fill.style.background = color;
+ 
+    if (thumb) thumb.style.left = `calc(${pct}% - 6px)`;
+}
+ 
+ 
 window.addEventListener('resize', initBg);
 initBg();
 animateBg();
-
+ 
+createGauge('temp_chart',     0,    50,   'linear-gradient(90deg, #00c9b8, #c8f135)');
+createGauge('ppm_chart',      0,  3000,   '#00c9b8');
+createGauge('humidity_chart', 0,   100,   'linear-gradient(90deg, #00c9b8, #6ec6ff)');
+ 
+ 
 if (connectBtn) {
     connectBtn.addEventListener('click', async () => {
         bleStatusTxt.textContent = 'SCANNING...';
         statusDot.className = 'status-dot live';
         try {
             const device = await navigator.bluetooth.requestDevice(BLE_OPTIONS);
-            bleStatusTxt.textContent = `CONNECTING...`;
-
-            const server = await device.gatt.connect();
+            bleStatusTxt.textContent = 'CONNECTING...';
+ 
+            const server  = await device.gatt.connect();
             const service = await server.getPrimaryService(SERVICE_UUID);
-
-            const charPPM = await service.getCharacteristic(CHAR_PPM);
-            const charTemp = await service.getCharacteristic(CHAR_TEMP);
+ 
+            const charPPM      = await service.getCharacteristic(CHAR_PPM);
+            const charTemp     = await service.getCharacteristic(CHAR_TEMP);
             const charHumidity = await service.getCharacteristic(CHAR_HUMIDITY);
-
+ 
             charPPM.addEventListener('characteristicvaluechanged', (e) => {
                 ppm = e.target.value.getFloat32(0, true).toFixed(1);
-                //document.getElementById("ppm_value").textContent = Math.round(ppm);
                 updateOverview(ppm);
                 updateDashboardGauges(temp || 0, ppm, humidity || 0);
             });
             await charPPM.startNotifications();
-
+ 
             charTemp.addEventListener('characteristicvaluechanged', (e) => {
                 temp = e.target.value.getFloat32(0, true).toFixed(1);
-                //document.getElementById("temp_value").textContent = temp;
                 updateDashboardGauges(temp, ppm || 0, humidity || 0);
             });
             await charTemp.startNotifications();
-
+ 
             charHumidity.addEventListener('characteristicvaluechanged', (e) => {
                 humidity = e.target.value.getFloat32(0, true).toFixed(1);
-                //document.getElementById("humidity_value").textContent = humidity;
-                updateDashboardGauges(temp || 0, ppm || 0, humidity)
+                updateDashboardGauges(temp || 0, ppm || 0, humidity);
             });
             await charHumidity.startNotifications();
-
+ 
             statsDiv.hidden = false;
-            connDiv.hidden = true;
-
+            connDiv.hidden  = true;
+ 
             device.addEventListener('gattserverdisconnected', () => { location.reload(); });
         } catch (err) {
             bleStatusTxt.textContent = 'CONNECTION FAILED';
@@ -138,63 +141,67 @@ if (connectBtn) {
         }
     });
 }
-
+ 
+ 
 function updateOverview(ppm) {
-    const statusEl = document.getElementById("overview_status");
-    const textEl = document.getElementById("overview_text");
+    const statusEl = document.getElementById('overview_status');
+    const textEl   = document.getElementById('overview_text');
     if (!statusEl || !textEl) return;
-    
-    statusEl.style.color = "transparent";
-    statusEl.style.webkitBackgroundClip = "text";
-
+ 
+    statusEl.style.color = 'transparent';
+    statusEl.style.webkitBackgroundClip = 'text';
+ 
     if (ppm < 600) {
-        statusEl.textContent = "Very Good";
-        statusEl.style.backgroundImage = "linear-gradient(135deg, #8fe3cf, #b9d86a)";
-        textEl.textContent = "Air quality appears fresh right now";
+        statusEl.textContent = 'Very Good';
+        statusEl.style.backgroundImage = 'linear-gradient(135deg, #8fe3cf, #b9d86a)';
+        textEl.textContent = 'Air quality appears fresh right now';
     } else if (ppm < 1000) {
-        statusEl.textContent = "Good";
-        statusEl.style.backgroundImage = "linear-gradient(135deg, #b9d86a, #d8f5eb)";
-        textEl.textContent = "Air quality looks good";
+        statusEl.textContent = 'Good';
+        statusEl.style.backgroundImage = 'linear-gradient(135deg, #b9d86a, #d8f5eb)';
+        textEl.textContent = 'Air quality looks good';
     } else {
-        statusEl.textContent = "Stuffy";
-        statusEl.style.backgroundImage = "linear-gradient(135deg, #ffd166, #ff9f43)";
-        textEl.textContent = "Air may be starting to feel stale";
+        statusEl.textContent = 'Stuffy';
+        statusEl.style.backgroundImage = 'linear-gradient(135deg, #ffd166, #ff9f43)';
+        textEl.textContent = 'Air may be starting to feel stale';
     }
 }
-
+ 
+ 
 if (publishBtn) {
     publishBtn.addEventListener('click', () => {
         navigator.geolocation.getCurrentPosition((pos) => {
             sendReading(ppm, humidity, temp, pos.coords.longitude, pos.coords.latitude);
             publishBtn.disabled = true;
-            publishBtn.textContent = "PUBLISHED";
+            publishBtn.textContent = 'PUBLISHED';
         });
     });
 }
-
+ 
 async function sendReading(ppm, hum, temp, lon, lat) {
     try {
-        await fetch("/api/readings", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ device_id: "esp32-1", ppm, humidity: hum, temperature: temp, longitude: lon, latitude: lat, time: new Date().toISOString() })
+        await fetch('/api/readings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                device_id: 'esp32-1', ppm, humidity: hum,
+                temperature: temp, longitude: lon, latitude: lat,
+                time: new Date().toISOString()
+            })
         });
     } catch (e) { console.error(e); }
 }
-
+ 
+ 
 function updateDashboardGauges(temp, ppm, hum) {
-    let gaugeColor = "#00c9b8"; 
-    if (ppm > 1000 && ppm < 1500) gaugeColor = "#FFD700"; 
-    if (ppm >= 1500) gaugeColor = "#FF4500"; 
-
-    document.getElementById("temp_value").innerText = temp;
-    document.getElementById("ppm_value").innerText = ppm;
-    document.getElementById("humidity_value").innerText = hum;
-
-    tempChart.update({ value: Number(temp) });
-    ppmChart.update({ 
-        value: Number(ppm),
-        series: { fill: gaugeColor } 
-    });
-    humidityChart.update({ value: Number(hum) });
+    let ppmColor = '#00c9b8';
+    if (ppm > 1000 && ppm < 1500) ppmColor = '#FFD700';
+    if (ppm >= 1500)               ppmColor = '#FF4500';
+ 
+    document.getElementById('temp_value').innerText     = temp;
+    document.getElementById('ppm_value').innerText      = ppm;
+    document.getElementById('humidity_value').innerText = hum;
+ 
+    updateGauge('temp_chart',     Number(temp), 'linear-gradient(90deg, #00c9b8, #c8f135)');
+    updateGauge('ppm_chart',      Number(ppm),  ppmColor);
+    updateGauge('humidity_chart', Number(hum),  'linear-gradient(90deg, #00c9b8, #6ec6ff)');
 }

@@ -142,57 +142,85 @@ function update_summary(){
 setTimeout(update_summary, 1000);
 
 
-const { AgCharts } = agCharts;
-
-function createGaugeOptions(containerId, min, max, unit) {
-  return {
-      type: "linear-gauge",
-      container: document.getElementById(containerId),
-      value: 0,
-      background: {
-          fill: "transparent", 
-      },
-      theme: {
-          overrides: {
-              "linear-gauge": {
-                  background: {
-                      fill: "transparent",
-                  },
-                  series: {
-                      fill: "#4facfe", 
-                      fillOpacity: 0.8,
-                      strokeWidth: 0,
-                      backgroundFill: "rgba(255, 255, 255, 0.1)",
-                  }
-              },
-          },
-      },
-      scale: {
-          min,
-          max,
-          label: {
-              fontFamily: "inherit",
-              color: "#009e90", 
-          }
-      },
-      direction: "horizontal",
-      cornerRadius: 99,
-      cornerMode: "container",
-      padding: { left: 5, right: 5, bottom: 20, top: 5 },
-  };
+function createGauge(containerId, min, max, color = '#00c9b8') {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = `
+      <div class="css-gauge" data-min="${min}" data-max="${max}">
+          <div class="css-gauge__track">
+              <div class="css-gauge__fill" style="width: 0%; background: ${color};"></div>
+              <div class="css-gauge__thumb"></div>
+          </div>
+          <div class="css-gauge__labels">
+              <span>${min}</span>
+              <span>${max}</span>
+          </div>
+      </div>`;
 }
 
-const tempChart = AgCharts.createGauge(createGaugeOptions("temp_chart", 0, 150, "°C"));
-const ppmChart = AgCharts.createGauge(createGaugeOptions("ppm_chart", 0, 3000, "ppm"));
-const humidityChart = AgCharts.createGauge(createGaugeOptions("humidity_chart", 0, 100, "%"));
+function updateGauge(containerId, value, color) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const gauge = container.querySelector('.css-gauge');
+  const fill  = container.querySelector('.css-gauge__fill');
+  const thumb = container.querySelector('.css-gauge__thumb');
+  if (!gauge || !fill) return;
+
+  const min = parseFloat(gauge.dataset.min);
+  const max = parseFloat(gauge.dataset.max);
+  const pct = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+
+  fill.style.width = pct + '%';
+  if (color) fill.style.background = color;
+  if (thumb) thumb.style.left = `calc(${pct}% - 6px)`;
+}
+
+// Initialise gauges 
+createGauge('temp_chart',     0,    50,   'linear-gradient(90deg, #00c9b8, #c8f135)');
+createGauge('ppm_chart',      0,  3000,   '#00c9b8');
+createGauge('humidity_chart', 0,   100,   'linear-gradient(90deg, #00c9b8, #6ec6ff)');
 
 
 function updateDashboardGauges(temp, ppm, hum) {
-    document.getElementById("temp_value").innerText = temp;
-    document.getElementById("ppm_value").innerText = ppm;
-    document.getElementById("humidity_value").innerText = hum;
+  let ppmColor = '#00c9b8';
+  if (ppm > 1000 && ppm < 1500) ppmColor = '#FFD700';
+  if (ppm >= 1500)               ppmColor = '#FF4500';
 
-    tempChart.update({ value: temp });
-    ppmChart.update({ value: ppm });
-    humidityChart.update({ value: hum });
+  updateGauge('temp_chart',     temp, 'linear-gradient(90deg, #00c9b8, #c8f135)');
+  updateGauge('ppm_chart',      ppm,  ppmColor);
+  updateGauge('humidity_chart', hum,  'linear-gradient(90deg, #00c9b8, #6ec6ff)');
 }
+
+function update_summary() {
+  let count = 0, total_temp = 0, total_ppm = 0, total_humidity = 0;
+  const bounds = map.getBounds();
+
+  map.eachLayer(function(layer) {
+      if (layer instanceof L.Marker && bounds.contains(layer.getLatLng()) && 'reading' in layer) {
+          total_ppm      += layer.reading.ppm;
+          total_humidity += layer.reading.humidity;
+          total_temp     += layer.reading.temperature;
+          count++;
+      }
+  });
+
+  if (count !== 0) {
+      document.getElementById('summary').hidden  = false;
+      document.getElementById('no-data').hidden  = true;
+
+      const avgTemp = parseFloat(total_temp     / count).toFixed(1);
+      const avgHum  = parseFloat(total_humidity / count).toFixed(1);
+      const avgPpm  = parseFloat(total_ppm      / count).toFixed(1);
+
+      document.getElementById('temp_value').innerHTML     = avgTemp;
+      document.getElementById('humidity_value').innerHTML = avgHum;
+      document.getElementById('ppm_value').innerHTML      = avgPpm;
+
+      updateDashboardGauges(Number(avgTemp), Number(avgPpm), Number(avgHum));
+  } else {
+      document.getElementById('summary').hidden = true;
+      document.getElementById('no-data').hidden = false;
+  }
+}
+
+setTimeout(update_summary, 1000);
