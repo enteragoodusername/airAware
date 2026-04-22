@@ -110,14 +110,12 @@ void setup (){
 void ppm_data_task(void* ptr){
     for(;;){
         float ppm = mq135.getPPM();
-        float rzero = mq135.getRZero();
         if (!std::isnan(ppm)){
             ppmValue = ppm;
         }
         Serial.print("1: PPM: ");
         Serial.print(ppm);
         Serial.print("RZero: ");
-        Serial.println(rzero);
         TempAndHumidity val = dht.getTempAndHumidity();
         if (!std::isnan(val.humidity)){
             humidityValue = val.humidity;

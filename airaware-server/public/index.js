@@ -197,6 +197,7 @@ function updateDashboardGauges(temp, ppm, hum) {
     if (ppm >= 1500)               ppmColor = '#FF4500';
 
     updateGauge(Number(ppm));
+    updateAlert(Number(ppm));
  
     document.getElementById('temp_value').innerText     = temp;
     document.getElementById('ppm_value').innerText      = ppm;
